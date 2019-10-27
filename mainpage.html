@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title> Chat Room </title>
+	<title> Map </title>
 	<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="" crossorigin="anonymous"></script> -->
 	<script type="text/javascript" src="mainpage.js" defer></script>
 	<link rel="stylesheet" type="text/css" href="mainpage.css">
@@ -11,13 +11,21 @@
 <body>
 	<div id="main_container">
 		<div id="top_bar_container"> </div>
-		<div id="left_container" style="background-color: rgb(200,180,200);"> </div>
+		<div id="left_container">
+			<div id="char_portrait_wrapper"> 
+				<div id="char_portrait_container">
+				</div>
+			</div>
+			<p> Str: 100 </p>
+			<p> Dex: 12 </p>
+			<p> Int: 53 </p>
+		</div>
 		<div id="map_container_wrapper"> 
 			<div id="map_container">
 				<table id="map_table"> </table> 
 			</div>
 		</div>
-		<div id="right_container" style="background-color: rgb(200,200,180);"> </div>
+		<div id="right_container"> </div>
 		<div id="bottom_center_container" style="background-color: rgb(180,200,200);"> 
 			<p id="flavor"> You are in the Plains </p> 
 		</div>

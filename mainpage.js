@@ -68,20 +68,25 @@ function buildMap(map_array){
 	}
 }
 
-
+var cur_icon = "url('char_icons/char_icon_white.png')"
+character_div = document.createElement("div");
+character_div.id = "char_div";
+character_div.style.backgroundImage=cur_icon;
+portrait_div = document.getElementById("char_portrait_container");
+portrait_div.style.backgroundImage=cur_icon;
 cur_square = [3,4]
-function eraseCharacter(square_pos){
-	row = square_pos[0];
-	col = square_pos[1];
-	new_square = cells_array[row][col].html_element;
-	new_square.style.backgroundImage="";
-}
+// function eraseCharacter(square_pos){
+	// row = square_pos[0];
+	// col = square_pos[1];
+	// new_square = cells_array[row][col].html_element;
+	// new_square.style.backgroundImage="";
+// }
 
-function drawCharacter(square_pos, user_icon){
+function drawCharacter(square_pos){
 	row = square_pos[0];
 	col = square_pos[1];
 	new_square = cells_array[row][col].html_element;
-	new_square.style.backgroundImage=user_icon;
+	new_square.appendChild(character_div);
 }
 
 function isInBounds(square_pos){
@@ -91,7 +96,7 @@ function isInBounds(square_pos){
 }
 
 function moveCharacter(direction){
-	eraseCharacter(cur_square);
+	// eraseCharacter(cur_square);
 	var new_square;
 	switch (direction){
 		case "up":
@@ -116,11 +121,8 @@ function moveCharacter(direction){
 	drawCharacter(cur_square, cur_icon);
 }
 
-var cur_icon = "url('char_icons/char_icon_white.png')"
 buildMap(cells_array);
 drawCharacter(cur_square, cur_icon);
-
-
 
 document.addEventListener('keydown', (e) => {
 	switch(e.code){
@@ -143,9 +145,22 @@ document.addEventListener('keydown', (e) => {
 	}
 });
 
+function addEquipment(equipment_name) {
+	new_equip = document.createElement("div");
+	new_equip.className="equipment";
+	new_equip.id=equipment_name;
+	new_equip.style.backgroundImage = "url('equipment_icons/"+equipment_name+".png')"
+	character_div.appendChild(new_equip);
 
+	new_equip_portrait = document.createElement("div");
+	new_equip_portrait.className="equipment_portrait";
+	new_equip_portrait.id=equipment_name+"_portrait";
+	new_equip_portrait.style.backgroundImage = "url('equipment_icons/"+equipment_name+".png')"
+	portrait_div.appendChild(new_equip_portrait);
+}
 
-
+// addEquipment("hat_wiz_blue");
+// addEquipment("pants_red");
 
 
 

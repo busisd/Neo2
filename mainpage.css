@@ -49,12 +49,42 @@ td {
 }
 
 #left_container {
+	background-color: rgb(200,180,200);
 	height: 100%;
 	grid-column: left / center_left;
 	grid-row: top / bottom;
+	
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+#char_portrait_wrapper {
+	position: relative;
+	padding-bottom: 50%; /* 1:1 ratio */
+	height: 0;
+	width: 50%;
+	align-self: center;
+}
+
+#char_portrait_container {
+	position: absolute;
+    top: 0;
+    left: 0;
+    bottom:0;
+	right:0;
+	background-size: 100%;
+	background-color: white;
+	border: 1px solid black;
+}
+
+#left_container p {
+	margin: 3px;
+	margin-left: 12px;
 }
 
 #right_container {
+	background-color: rgb(200,200,180);
 	height: 100%;
 	grid-column: center_right / right;
 	grid-row: top / bottom;
@@ -65,7 +95,7 @@ td {
 	grid-row: row_middle / bottom;
 }
 
-p {
+#bottom_center_container p {
 	margin: 12px;
 }
 
@@ -99,4 +129,18 @@ p {
 		grid-column: left / right;
 		grid-row: 5;
 	}
+}
+
+#char_div {
+	width: 100%;
+	height: 100%;
+	background-size: 100%;
+}
+
+.equipment, .equipment_portrait {
+	position: relative;
+	margin-bottom: -100%;
+	width: parent;
+	height: 100%;
+	background-size: 100%;
 }
