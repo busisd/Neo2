@@ -7,7 +7,7 @@ html, body {
 	height: 100%;
 	display:grid;
 	position: relative;
-	grid-template-columns: [left] 35% [center_left] 1fr [center_right] 35% [right];
+	grid-template-columns: [left] 30% [center_left] 1fr [center_right] 30% [right];
 	grid-template-rows: [toptop] 50px [top] max-content [row_middle] 1fr [bottom];
 }
 
@@ -63,4 +63,40 @@ td {
 #bottom_center_container {
 	grid-column: center_left / center_right;
 	grid-row: row_middle / bottom;
+}
+
+p {
+	margin: 12px;
+}
+
+@media (max-width: 6in) {
+	#main_container{
+		grid-template-columns: [left] 100% [right];
+		grid-template-rows: 50px max-content 100px 100px 100px;
+	}
+	
+	#top_bar_container {
+		grid-column: left / right;
+		grid-row: 1;
+	}
+	
+	#map_container_wrapper {
+		grid-column: left / right;
+		grid-row: 2;
+	}
+
+	#bottom_center_container {
+		grid-column: left / right;
+		grid-row: 3;
+	}
+	
+	#left_container {
+		grid-column: left / right;
+		grid-row: 4;
+	}
+	
+	#right_container {
+		grid-column: left / right;
+		grid-row: 5;
+	}
 }
