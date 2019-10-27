@@ -1,10 +1,10 @@
-
 class CellData {
 	constructor(row, col, bg_color = "rgb(130, 255, 110)", passable = true){
 		this.row = row;
 		this.col = col;
 		this.bg_color = bg_color;
 		this.passable = passable;
+		this.html_element = this.calcCell();
 	}
 	
 	calcCell() {
@@ -14,7 +14,7 @@ class CellData {
 		return cell;
 	}
 	
-	static rowColToString(row, col){
+	static rowColToString(row, col) {
 		return "cell_row_"+String(row)+"_col_"+String(col);
 	}
 }
@@ -38,9 +38,9 @@ var tilemap = [
 var MAX_ROWS = tilemap.length;
 var MAX_COLS = tilemap[0].length;
 var cells_array=[];
-for (i = 0; i < MAX_ROWS; i++) {
+for (var i = 0; i < MAX_ROWS; i++) {
 	cells_array[i]=[];
-	for (j = 0; j < MAX_COLS; j++) {
+	for (var j = 0; j < MAX_COLS; j++) {
 		cells_array[i][j] = new CellData(i,j,tilemap[i][j][0],tilemap[i][j][1]);
 	}
 }
@@ -58,12 +58,11 @@ for (i = 0; i < MAX_ROWS; i++) {
 var map_table = document.getElementById("map_table");
 
 function buildMap(map_array){
-	console.log(map_array);
-	for (i = 0; i < map_array.length; i++) {
+	for (var i = 0; i < map_array.length; i++) {
 		var cur_row = document.createElement("tr");
 		map_table.appendChild(cur_row);
-		for (j = 0; j < map_array[i].length; j++) {
-			var cur_cell = map_array[i][j].calcCell();
+		for (var j = 0; j < map_array[i].length; j++) {
+			var cur_cell = map_array[i][j].html_element;
 			cur_row.appendChild(cur_cell);
 		}
 	}
@@ -74,15 +73,14 @@ cur_square = [3,4]
 function eraseCharacter(square_pos){
 	row = square_pos[0];
 	col = square_pos[1];
-	new_square = document.getElementById(CellData.rowColToString(row, col));
+	new_square = cells_array[row][col].html_element;
 	new_square.style.backgroundImage="";
 }
 
 function drawCharacter(square_pos, user_icon){
 	row = square_pos[0];
 	col = square_pos[1];
-	console.log(row, col);
-	new_square = document.getElementById(CellData.rowColToString(row, col));
+	new_square = cells_array[row][col].html_element;
 	new_square.style.backgroundImage=user_icon;
 }
 
