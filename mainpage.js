@@ -145,27 +145,45 @@ document.addEventListener('keydown', (e) => {
 	}
 });
 
-function addEquipment(equipment_name) {
-	new_equip = document.createElement("div");
+cur_equipment = {"pants":null, "hat":null, "shirt": null}
+cur_equipment_portrait = {"pants":null, "hat":null, "shirt": null}
+
+function addEquipment(slot_name, equipment_name) {
+	var new_equip = document.createElement("div");
 	new_equip.className="equipment";
 	new_equip.id=equipment_name;
 	new_equip.style.backgroundImage = "url('equipment_icons/"+equipment_name+".png')"
 	character_div.appendChild(new_equip);
 
-	new_equip_portrait = document.createElement("div");
+	var new_equip_portrait = document.createElement("div");
 	new_equip_portrait.className="equipment_portrait";
 	new_equip_portrait.id=equipment_name+"_portrait";
 	new_equip_portrait.style.backgroundImage = "url('equipment_icons/"+equipment_name+".png')"
 	portrait_div.appendChild(new_equip_portrait);
+	
+	cur_equipment[slot_name] = new_equip;
+	cur_equipment_portrait[slot_name] = new_equip_portrait;
 }
 
-// addEquipment("hat_wiz_blue");
-// addEquipment("pants_red");
 
+function clearEquipment(slot_name) {
+	if (cur_equipment[slot_name] === null) {
+		return
+	}
+	
+	char_div.removeChild(cur_equipment[slot_name]);
+	portrait_div.removeChild(cur_equipment_portrait[slot_name]);
+	cur_equipment[slot_name] = null;
+	cur_equipment_portrait[slot_name] = null;
+}
 
-
-
-
+function change_equipment(caller_ele) {
+	var equip_selected = JSON.parse(caller_ele.value);
+	clearEquipment(equip_selected[0]);
+	if (equip_selected[1] !== null){
+		addEquipment(equip_selected[0], equip_selected[1]);
+	}
+}
 
 
 

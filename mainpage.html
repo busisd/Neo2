@@ -19,6 +19,30 @@
 			<p> Str: 100 </p>
 			<p> Dex: 12 </p>
 			<p> Int: 53 </p>
+			<span> Hat:
+				<select onchange="change_equipment(this)">
+					<option value='["hat", null]'> None </option>
+					<option value='["hat", "hat_wiz_red"]'> Red hat </option>
+					<option value='["hat", "hat_wiz_blue"]'> Blue hat </option>
+					<option value='["hat", "hat_wiz_green"]'> Green hat </option>
+				</select>
+			</span>
+			<span> Shirt: 
+				<select onchange="change_equipment(this)">
+					<option value='["shirt", null]'> None </option>
+					<option value='["shirt", "shirt_red"]'> Red shirt </option>
+					<option value='["shirt", "shirt_blue"]'> Blue shirt </option>
+					<option value='["shirt", "shirt_green"]'> Green shirt </option>
+				</select>
+			</span>
+			<span> Pants:
+				<select onchange="change_equipment(this)">
+					<option value='["pants", null]'> None </option>
+					<option value='["pants", "pants_red"]'> Red Pants </option>
+					<option value='["pants", "pants_blue"]'> Blue Pants </option>
+					<option value='["pants", "pants_green"]'> Green Pants </option>
+				</select>
+			</span>
 		</div>
 		<div id="map_container_wrapper"> 
 			<div id="map_container">
