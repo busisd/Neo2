@@ -1,3 +1,106 @@
+class GameSession {
+	constructor(){
+		this.cur_encounter = null;
+		this.player_character = new Character;
+		this.cur_map = null;
+		this.cur_char_pos = null;
+	}
+	
+	
+}
+
+class Encounter {
+	
+}
+
+class MonsterEncounter extends Encounter {
+	constructor(monster = new SlimeMonster()){
+		super();
+		this.monster = monster;
+	}
+}
+
+class Character {
+	constructor(hp = 10, stats={"STR": 3, "DEX": 3, "INT": 3}){
+		this.hp = hp;
+		this.stats = stats;
+	}	
+}
+
+class Monster extends Character {
+	constructor(hp = 10){
+		super(hp);
+		this.portrait = url('char_icons/generic_monster.png');
+		this.basic_attack = new Attack();
+	}
+	
+	act(){
+		var attacks = [];
+		attacks.push(basic_attack);
+		return attacks;
+	}
+}
+
+class SlimeMonster extends Monster {
+	constructor(){
+		super(randomIntBetween(8,12));
+		this.portrait = url('char_icons/slime.png');
+		var attack_flavor_roll = {launch: "The slime attempts to roll into you!", 
+								hit: "It hits you!", 
+								miss: "You dive out of the way!"}
+		var attack_flavor_swing = {launch: "The slime grows a pseudopod and attempts to hit you!", 
+								hit: "It hits you!", 
+								miss: "You block the attack!"}
+		this.roll_attack = new Attack("DEX", 3, 1, 2, attack_flavor_roll);
+		this.swing_attack = new Attack("STR", 3, 1, 2, attack_flavor_swing);
+	}
+	
+	act(){
+		var attacks = [];
+		if (Math.random() > 0.5){
+			attacks.push(this.roll_attack);
+		} else {
+			attacks.push(this.swing_attack); 
+		}
+		return attacks;
+	}
+}
+
+class Attack {
+	constructor(target_stat = "STR", accuracy = 0, damage_min = 1, damage_max = 1,
+				flavor_text = {launch: "It swings", hit: "It connects", miss: "It misses"}){
+		this.target_stat = target_stat;
+		this.accuracy = accuracy;
+		this.damage_min = damage_min;
+		this.damage_max = damage_max;
+	}
+	
+	calculateHitOn(character){
+		if (this.accuracy*Math.random()*2 > character.stats[this.target_stat]) {
+			return makeHit();
+		} else {
+			return makeMiss();
+		}
+	}
+	
+	makeMiss(){
+		
+	}
+	
+	makeHit(){
+		
+	}
+}
+
+function randomIntBetween(min, max){
+	/*
+		Returns a random int between the two values, inclusive
+	*/
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random()*(max - min + 1) + min);
+}
+
 class CellData {
 	constructor(row, col, bg_color = "rgb(130, 255, 110)", passable = true){
 		this.row = row;
@@ -69,9 +172,12 @@ function buildMap(map_array){
 }
 
 var cur_icon = "url('char_icons/char_icon_white.png')"
+// var cur_icon = "char_icons/char_icon_white.png" // This makes things resize weirdly for the image
 character_div = document.createElement("div");
+// character_div = document.createElement("img");
 character_div.id = "char_div";
 character_div.style.backgroundImage=cur_icon;
+// character_div.src=cur_icon;
 portrait_div = document.getElementById("char_portrait_container");
 portrait_div.style.backgroundImage=cur_icon;
 cur_square = [3,4]
@@ -186,4 +292,15 @@ function change_equipment(caller_ele) {
 }
 
 
+map_wrapper = document.getElementById("map_container_wrapper");
+encounter_div = document.getElementById("encounter_div");
+function toggle_encounter(is_encounter) {
+	if (is_encounter) {
+		map_wrapper.style.visibility = "hidden";
+		encounter_div.style.visibility = "visible";
+	} else {
+		map_wrapper.style.visibility = "visible";
+		encounter_div.style.visibility = "hidden";
+	}
+}
 

@@ -17,6 +17,13 @@ html, body {
 	background-color: rgb(180,180,200);
 }
 
+#encounter_div {
+	grid-column: center_left / center_right;
+	grid-row: top / row_middle;
+	background-color: green;
+	visibility: hidden;
+}
+
 /* https://stackoverflow.com/questions/5445491/height-equal-to-dynamic-width-css-fluid-layout */
 #map_container_wrapper {
 	grid-column: center_left / center_right;
@@ -110,7 +117,7 @@ td {
 		grid-row: 1;
 	}
 	
-	#map_container_wrapper {
+	#map_container_wrapper, #encounter_div {
 		grid-column: left / right;
 		grid-row: 2;
 	}
