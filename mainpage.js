@@ -28,15 +28,15 @@ class Character {
 }
 
 class Monster extends Character {
-	constructor(hp = 10){
+	constructor(hp = 10, portrait = 'char_icons/generic_monster.png'){
 		super(hp);
-		this.portrait = url('char_icons/generic_monster.png');
+		this.portrait = portrait;
 		this.basic_attack = new Attack();
 	}
 	
 	act(){
 		var attacks = [];
-		attacks.push(basic_attack);
+		attacks.push(this.basic_attack);
 		return attacks;
 	}
 }
@@ -44,7 +44,7 @@ class Monster extends Character {
 class SlimeMonster extends Monster {
 	constructor(){
 		super(randomIntBetween(8,12));
-		this.portrait = url('char_icons/slime.png');
+		this.portrait = 'char_icons/slime.png';
 		var attack_flavor_roll = {launch: "The slime attempts to roll into you!", 
 								hit: "It hits you!", 
 								miss: "You dive out of the way!"}
@@ -73,22 +73,24 @@ class Attack {
 		this.accuracy = accuracy;
 		this.damage_min = damage_min;
 		this.damage_max = damage_max;
+		this.flavor_text = flavor_text;
 	}
 	
 	calculateHitOn(character){
 		if (this.accuracy*Math.random()*2 > character.stats[this.target_stat]) {
-			return makeHit();
+			return this.makeHit();
 		} else {
-			return makeMiss();
+			return this.makeMiss();
 		}
 	}
 	
 	makeMiss(){
-		
+		return {attack_hit: false, damage: 0, flavor: this.flavor_text.miss}
 	}
 	
 	makeHit(){
-		
+		var damage_done = randomIntBetween(this.damage_min, this.damage_max);
+		return {attack_hit: true, damage: damage_done, flavor: this.flavor_text.hit}
 	}
 }
 
