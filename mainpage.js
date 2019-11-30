@@ -223,6 +223,22 @@ function moveCharacter(direction){
 			new_square = [cur_square[0], cur_square[1]+1];
 			if (isInBounds(new_square)) cur_square = new_square;
 			break;
+		case "up_right":
+			new_square = [cur_square[0]-1, cur_square[1]+1];
+			if (isInBounds(new_square)) cur_square = new_square;
+			break;
+		case "up_left":
+			new_square = [cur_square[0]-1, cur_square[1]-1];
+			if (isInBounds(new_square)) cur_square = new_square;
+			break;
+		case "down_right":
+			new_square = [cur_square[0]+1, cur_square[1]+1];
+			if (isInBounds(new_square)) cur_square = new_square;
+			break;
+		case "down_left":
+			new_square = [cur_square[0]+1, cur_square[1]-1];
+			if (isInBounds(new_square)) cur_square = new_square;
+			break;
 		default:
 			break;
 	}
@@ -305,4 +321,41 @@ function toggle_encounter(is_encounter) {
 		encounter_div.style.visibility = "hidden";
 	}
 }
+
+
+arrow_dir_map = {
+	0: "up_left",
+	1: "up",
+	2: "up_right",
+	3: "left",
+	4: "stay",
+	5: "right",
+	6: "down_left",
+	7: "down",
+	8: "down_right"
+}
+function handle_arrows_clicked(ev, caller_ele) {
+	// console.log("x:", ev.pageX, "y:", ev.pageY);
+	// console.log("ele x:", caller_ele.offsetLeft, "ele y:", caller_ele.offsetTop);
+	var cur_x = ev.pageX - caller_ele.offsetLeft;
+	var cur_y = ev.pageY - caller_ele.offsetTop;
+	// console.log("x:", cur_x, "y:", cur_y);
+	
+	var cur_select = 0;
+	if (cur_x > 70) {
+		cur_select += 1;
+	}
+	if (cur_x > 142) {
+		cur_select += 1;
+	}
+	if (cur_y > 70) {
+		cur_select += 1*3;
+	}
+	if (cur_y > 142) {
+		cur_select += 1*3;
+	}
+	
+	moveCharacter(arrow_dir_map[cur_select]);
+}
+
 

@@ -95,6 +95,10 @@ td {
 	height: 100%;
 	grid-column: center_right / right;
 	grid-row: top / bottom;
+	
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
 }
 
 #bottom_center_container {
@@ -151,3 +155,9 @@ td {
 	height: 100%;
 	background-size: 100%;
 }
+
+#arrows {
+	cursor: pointer;
+	align-self: center;
+}
+
