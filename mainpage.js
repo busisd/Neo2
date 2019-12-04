@@ -104,12 +104,17 @@ function randomIntBetween(min, max){
 }
 
 class CellData {
+	/*
+		Class that stores the data for specific cells/tiles on the map.
+	*/
+	
 	constructor(row, col, bg_color = "rgb(130, 255, 110)", passable = true){
 		this.row = row;
 		this.col = col;
 		this.bg_color = bg_color;
 		this.passable = passable;
 		this.html_element = this.calcCell();
+		this.special_behavior = {}
 	}
 	
 	calcCell() {
@@ -122,12 +127,81 @@ class CellData {
 	static rowColToString(row, col) {
 		return "cell_row_"+String(row)+"_col_"+String(col);
 	}
+	
+	changeType(new_type) {
+		this.bg_color = new_type[0];
+		this.html_element.style="background-color: "+this.bg_color+";";
+		this.passable = new_type[1];
+	}
 }
 
-G = ["rgb(130, 255, 110)", true]; //grass tiles
-R = ["rgb(0, 153, 255)", false]; //river tiles
-B = ["rgb(153, 102, 51)", true]; //bridge tiles
-var tilemap = [
+function mapFromTiles(tiles_array) {
+	/* 
+		Given an array of tiles (which are arrays of the form ["color", isPassable?]), 
+		returns an array of CellData objects that correspond to the given tiles.
+	*/
+	
+	new_map = [];
+	for (var i = 0; i < tiles_array.length; i++) {
+		new_map[i]=[];
+		for (var j = 0; j < tiles_array[i].length; j++) {
+			new_map[i][j] = new CellData(i,j,tiles_array[i][j][0],tiles_array[i][j][1]);
+		}
+	}
+	
+	return new_map;
+}
+
+function transition_func(new_map, new_pos) {
+	/*
+		Returns a lambda function that transitions the map to the given new map,
+		setting the character at the given new position.
+	*/
+	var new_func = function() {changeMap(new_pos, new_map)}
+	return new_func;
+}
+
+function add_vertical_transitions(bottom_map, top_map){
+	/*
+		Adds transitions from bottom_map to top_map, along the entire top/bottom edge.
+		Does so by modifying the special_behavior array of each cell along the appropriate
+		rows in the two maps.
+	*/
+	
+	for (var i = 0; i<MAX_COLS; i++){
+		//Note that, if we don't use transition_func, then the lambda function will change with the changing value of i.
+		bottom_map[0][i].special_behavior["up"] = transition_func(top_map, [MAX_ROWS-1, i]);
+		top_map[MAX_ROWS-1][i].special_behavior["down"] = transition_func(bottom_map, [0, i]);
+	}
+}
+
+function add_horizontal_transitions(left_map, right_map){
+	/*
+		Adds transitions from left_map to right_map, along the entire right/left edge.
+		Does so by modifying the special_behavior array of each cell along the appropriate
+		columns in the two maps.
+	*/
+	
+	for (var i = 0; i<MAX_ROWS; i++){
+		//Note that, if we don't use transition_func, then the lambda function will change with the changing value of i.
+		left_map[i][MAX_COLS-1].special_behavior["right"] = transition_func(right_map, [i, 0]);
+		right_map[i][0].special_behavior["left"] = transition_func(left_map, [i, MAX_COLS-1]);
+	}
+}
+
+// ################################ CREATING THE MAPS ################################
+
+var MAX_ROWS = 11;
+var MAX_COLS = 11;
+
+var G = ["rgb(130, 255, 110)", true]; //grass tiles
+var R = ["rgb(0, 153, 255)", false]; //river tiles
+var B = ["rgb(153, 102, 51)", true]; //bridge tiles
+var M = ["rgb(166, 173, 172)", false]; //mountain tiles
+var L = ["rgb(235, 80, 80)", true]; //lever tiles
+var S = ["rgb(235, 235, 245)", true]; //snow tiles
+
+var tiles_grasslands = [
 [G, G, G, G, G, G, R, G, G, G, G],
 [G, G, G, G, G, G, R, G, G, G, G],
 [G, G, G, G, G, G, R, R, G, G, G],
@@ -136,29 +210,74 @@ var tilemap = [
 [G, G, G, G, G, G, G, R, G, G, G],
 [G, G, G, G, G, G, B, B, B, G, G],
 [G, G, G, G, G, G, B, B, B, G, G],
-[G, G, G, G, G, G, G, R, G, G, G],
+[G, G, G, G, L, G, G, R, G, G, G],
 [G, G, G, G, G, G, G, R, G, G, G],
 [G, G, G, G, G, G, G, R, G, G, G]
 ];
-var MAX_ROWS = tilemap.length;
-var MAX_COLS = tilemap[0].length;
-var cells_array=[];
-for (var i = 0; i < MAX_ROWS; i++) {
-	cells_array[i]=[];
-	for (var j = 0; j < MAX_COLS; j++) {
-		cells_array[i][j] = new CellData(i,j,tilemap[i][j][0],tilemap[i][j][1]);
+var map_grasslands = mapFromTiles(tiles_grasslands);
+
+var tiles_grasslands_north = [
+[M, M, M, G, G, G, G, G, G, G, G],
+[M, M, M, G, G, G, G, G, G, G, G],
+[M, M, G, G, G, G, G, M, M, M, G],
+[M, G, G, G, G, G, M, M, R, M, G],
+[G, G, G, G, G, G, M, R, R, M, G],
+[M, G, G, G, M, M, M, R, M, M, G],
+[M, G, G, G, G, R, R, R, M, G, G],
+[M, M, G, G, G, R, R, M, G, G, G],
+[M, M, G, G, G, G, R, G, G, G, G],
+[M, G, G, G, G, G, R, G, G, G, G],
+[G, G, G, G, G, G, R, G, G, G, G]
+];
+var map_grasslands_north = mapFromTiles(tiles_grasslands_north);
+
+var tiles_mountains = [
+[M, M, M, M, G, R, G, G, M, M, M],
+[M, M, M, M, R, R, G, M, M, M, M],
+[G, G, M, M, R, M, M, M, M, M, M],
+[M, G, G, B, B, B, G, G, G, M, M],
+[M, M, M, M, R, M, M, G, G, G, G],
+[M, M, M, M, R, R, M, M, M, M, M],
+[M, M, M, M, M, R, M, M, M, M, M],
+[M, M, S, M, M, R, R, R, R, R, M],
+[M, S, S, S, M, M, M, M, R, R, M],
+[M, M, S, S, M, M, M, M, M, M, M],
+[M, M, M, M, M, M, M, M, M, M, M]
+];
+var map_mountains = mapFromTiles(tiles_mountains);
+
+var tiles_lake = [
+[G, G, G, G, G, G, G, R, G, G, G],
+[G, G, G, G, G, G, R, R, G, G, G],
+[G, G, G, G, G, R, R, R, R, G, G],
+[G, G, G, G, R, R, R, R, R, G, G],
+[G, G, G, G, R, R, R, R, R, R, G],
+[G, G, G, R, R, R, R, R, R, R, G],
+[G, G, G, R, R, R, R, R, R, R, G],
+[G, G, G, G, R, R, R, R, R, R, G],
+[G, G, G, G, R, R, R, R, R, G, G],
+[G, G, G, G, G, R, R, R, R, G, G],
+[G, G, G, G, G, R, R, R, G, G, G]
+];
+var map_lake = mapFromTiles(tiles_lake);
+
+add_vertical_transitions(map_grasslands, map_grasslands_north);
+add_vertical_transitions(map_lake, map_grasslands);
+
+//Adds a button that lowers/raises the bridge on map_grasslands
+map_grasslands[8][4].special_behavior["interact"] = function() {
+	if (map_grasslands[6][7].passable) {
+		map_grasslands[6][7].changeType(R);
+		map_grasslands[7][7].changeType(R);
+	} else {
+		map_grasslands[6][7].changeType(B);
+		map_grasslands[7][7].changeType(B);		
 	}
 }
 
-// var MAX_ROWS = 11;
-// var MAX_COLS = 11;
-// var cells_array=[];
-// for (i = 0; i < MAX_ROWS; i++) {
-	// cells_array[i]=[];
-	// for (j = 0; j < MAX_COLS; j++) {
-		// cells_array[i][j] = new CellData(i,j);
-	// }
-// }
+add_horizontal_transitions(map_mountains, map_grasslands_north);
+
+// ############################## DONE CREATING THE MAPS ##############################
 
 var map_table = document.getElementById("map_table");
 
@@ -173,79 +292,100 @@ function buildMap(map_array){
 	}
 }
 
+function changeMap(new_pos, new_map) {
+	if (!isInBounds(new_pos, new_map)) {
+		return;
+	}
+	cur_map = new_map;
+	map_table.innerHTML = "";
+	buildMap(cur_map);
+	cur_square = new_pos;
+	drawCharacter(cur_square, cur_icon);
+}
+
 var cur_icon = "url('char_icons/char_icon_white.png')"
 // var cur_icon = "char_icons/char_icon_white.png" // This makes things resize weirdly for the image
-character_div = document.createElement("div");
+var character_div = document.createElement("div");
 // character_div = document.createElement("img");
 character_div.id = "char_div";
 character_div.style.backgroundImage=cur_icon;
 // character_div.src=cur_icon;
-portrait_div = document.getElementById("char_portrait_container");
+var portrait_div = document.getElementById("char_portrait_container");
 portrait_div.style.backgroundImage=cur_icon;
-cur_square = [3,4]
+var cur_square = [3,4]
 // function eraseCharacter(square_pos){
 	// row = square_pos[0];
 	// col = square_pos[1];
-	// new_square = cells_array[row][col].html_element;
+	// new_square = map_grasslands[row][col].html_element;
 	// new_square.style.backgroundImage="";
 // }
 
-function drawCharacter(square_pos){
-	row = square_pos[0];
-	col = square_pos[1];
-	new_square = cells_array[row][col].html_element;
-	new_square.appendChild(character_div);
+//returns the cell in the current map corresponding to the given position
+function getCell(square_pos, square_map) {
+	return square_map[square_pos[0]][square_pos[1]];
 }
 
-function isInBounds(square_pos){
+function drawCharacter(square_pos) {
+	var new_square = getCell(square_pos, cur_map);
+	new_square.html_element.appendChild(character_div);
+}
+
+function isInBounds(square_pos, square_map=cur_map){
 	return (square_pos[0] >= 0 && square_pos[0] < MAX_ROWS && 
 			square_pos[1] >= 0 && square_pos[1] < MAX_COLS &&
-			cells_array[square_pos[0]][square_pos[1]].passable);
+			getCell(square_pos, square_map).passable);
 }
+
 
 function moveCharacter(direction){
 	// eraseCharacter(cur_square);
-	var new_square;
-	switch (direction){
-		case "up":
-			new_square = [cur_square[0]-1, cur_square[1]];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "down":
-			new_square = [cur_square[0]+1, cur_square[1]];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "left":
-			new_square = [cur_square[0], cur_square[1]-1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "right":
-			new_square = [cur_square[0], cur_square[1]+1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "up_right":
-			new_square = [cur_square[0]-1, cur_square[1]+1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "up_left":
-			new_square = [cur_square[0]-1, cur_square[1]-1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "down_right":
-			new_square = [cur_square[0]+1, cur_square[1]+1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		case "down_left":
-			new_square = [cur_square[0]+1, cur_square[1]-1];
-			if (isInBounds(new_square)) cur_square = new_square;
-			break;
-		default:
-			break;
+	var special_act = cur_map[cur_square[0]][cur_square[1]].special_behavior[direction];
+	if (special_act) {
+		special_act();
+	} else {
+		var new_square;
+		switch (direction){
+			case "up":
+				new_square = [cur_square[0]-1, cur_square[1]];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "down":
+				new_square = [cur_square[0]+1, cur_square[1]];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "left":
+				new_square = [cur_square[0], cur_square[1]-1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "right":
+				new_square = [cur_square[0], cur_square[1]+1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "up_right":
+				new_square = [cur_square[0]-1, cur_square[1]+1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "up_left":
+				new_square = [cur_square[0]-1, cur_square[1]-1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "down_right":
+				new_square = [cur_square[0]+1, cur_square[1]+1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			case "down_left":
+				new_square = [cur_square[0]+1, cur_square[1]-1];
+				if (isInBounds(new_square)) cur_square = new_square;
+				break;
+			default:
+				break;
+		}
+		drawCharacter(cur_square, cur_icon);
 	}
-	drawCharacter(cur_square, cur_icon);
 }
 
-buildMap(cells_array);
+var cur_map = map_grasslands;
+buildMap(cur_map);
 drawCharacter(cur_square, cur_icon);
 
 document.addEventListener('keydown', (e) => {
@@ -265,6 +405,10 @@ document.addEventListener('keydown', (e) => {
 		case("ArrowRight"):
 			e.preventDefault();
 			moveCharacter("right")
+			break;
+		case("Space"):
+			e.preventDefault();
+			moveCharacter("interact")
 			break;
 	}
 });
@@ -328,7 +472,7 @@ arrow_dir_map = {
 	1: "up",
 	2: "up_right",
 	3: "left",
-	4: "stay",
+	4: "interact",
 	5: "right",
 	6: "down_left",
 	7: "down",
