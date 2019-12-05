@@ -413,14 +413,16 @@ document.addEventListener('keydown', (e) => {
 	}
 });
 
-cur_equipment = {"pants":null, "hat":null, "shirt": null}
-cur_equipment_portrait = {"pants":null, "hat":null, "shirt": null}
+var cur_equipment = {"pants":null, "hat":null, "shirt": null}
+var cur_equipment_portrait = {"pants":null, "hat":null, "shirt": null}
+
+
 
 function addEquipment(slot_name, equipment_name) {
-	var new_equip = document.createElement("div");
+	var new_equip = document.createElement("img");
 	new_equip.className="equipment";
 	new_equip.id=equipment_name;
-	new_equip.style.backgroundImage = "url('equipment_icons/"+equipment_name+".png')"
+	new_equip.src = "equipment_icons/"+equipment_name+".png"
 	character_div.appendChild(new_equip);
 
 	var new_equip_portrait = document.createElement("div");
