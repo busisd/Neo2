@@ -20,8 +20,9 @@ html, body {
 #encounter_div {
 	grid-column: center_left / center_right;
 	grid-row: top / row_middle;
-	background-color: green;
-	visibility: hidden;
+	background-color: rgb(231, 248, 255);
+	display: none;
+	text-align: center;
 }
 
 /* https://stackoverflow.com/questions/5445491/height-equal-to-dynamic-width-css-fluid-layout */

@@ -16,10 +16,10 @@
 				<div id="char_portrait_container">
 				</div>
 			</div>
-			<p> Str: 100 </p>
-			<p> Dex: 12 </p>
-			<p> Int: 53 </p>
-			<span> Hat:
+			<p id="str_p"> Str: <span id="str_val">0</span> </p>
+			<p id="dex_p"> Dex: <span id="dex_val">0</span> </p>
+			<p id="int_p"> Int: <span id="int_val">0</span> </p>
+			<p><span> Hat:
 				<select onchange="change_equipment(this)">
 					<option value='["hat", null]'> None </option>
 					<option value='["hat", "hat_wiz_red"]'> Red hat </option>
@@ -27,6 +27,7 @@
 					<option value='["hat", "hat_wiz_green"]'> Green hat </option>
 				</select>
 			</span>
+			<br>
 			<span> Shirt: 
 				<select onchange="change_equipment(this)">
 					<option value='["shirt", null]'> None </option>
@@ -35,6 +36,7 @@
 					<option value='["shirt", "shirt_green"]'> Green shirt </option>
 				</select>
 			</span>
+			<br>
 			<span> Pants:
 				<select onchange="change_equipment(this)">
 					<option value='["pants", null]'> None </option>
@@ -42,14 +44,16 @@
 					<option value='["pants", "pants_blue"]'> Blue Pants </option>
 					<option value='["pants", "pants_green"]'> Green Pants </option>
 				</select>
-			</span>
+			</span></p>
 		</div>
 		<div id="map_container_wrapper"> 
 			<div id="map_container">
 				<table id="map_table"> </table> 
 			</div>
 		</div>
-		<div id="encounter_div"> </div>
+		<div id="encounter_div"> 
+			<img id="encounter_portrait"> </img>
+		</div>
 		<div id="right_container"> 
 			<img id="arrows" onclick="handle_arrows_clicked(event, this)" src="arrow_icons/arrows_3.png" draggable="false"> </img>
 		</div>

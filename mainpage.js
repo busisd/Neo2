@@ -9,6 +9,8 @@ class GameSession {
 	
 }
 
+// ################################ ENCOUNTER METHODS ################################
+
 class Encounter {
 	
 }
@@ -24,19 +26,20 @@ class Character {
 	constructor(hp = 10, stats={"STR": 3, "DEX": 3, "INT": 3}){
 		this.hp = hp;
 		this.stats = stats;
+		this.all_attacks = {};
 	}	
 }
 
 class Monster extends Character {
-	constructor(hp = 10, portrait = 'char_icons/generic_monster.png'){
+	constructor(hp = 10, portrait = 'monster_icons/generic_monster.png'){
 		super(hp);
 		this.portrait = portrait;
-		this.basic_attack = new Attack();
+		this.all_attacks["basic_attack"] = new Attack(this);
 	}
 	
 	act(){
 		var attacks = [];
-		attacks.push(this.basic_attack);
+		attacks.push(this.all_attacks["basic_attack"]);
 		return attacks;
 	}
 }
@@ -44,15 +47,15 @@ class Monster extends Character {
 class SlimeMonster extends Monster {
 	constructor(){
 		super(randomIntBetween(8,12));
-		this.portrait = 'char_icons/slime.png';
+		this.portrait = 'monster_icons/slime.png';
 		var attack_flavor_roll = {launch: "The slime attempts to roll into you!", 
 								hit: "It hits you!", 
 								miss: "You dive out of the way!"}
 		var attack_flavor_swing = {launch: "The slime grows a pseudopod and attempts to hit you!", 
 								hit: "It hits you!", 
 								miss: "You block the attack!"}
-		this.roll_attack = new Attack("DEX", 3, 1, 2, attack_flavor_roll);
-		this.swing_attack = new Attack("STR", 3, 1, 2, attack_flavor_swing);
+		this.roll_attack = new Attack(this, "DEX", 1, 2, attack_flavor_roll);
+		this.swing_attack = new Attack(this, "STR", 1, 2, attack_flavor_swing);
 	}
 	
 	act(){
@@ -67,17 +70,17 @@ class SlimeMonster extends Monster {
 }
 
 class Attack {
-	constructor(target_stat = "STR", accuracy = 0, damage_min = 1, damage_max = 1,
+	constructor(char_attacker, target_stat = "STR", damage_min = 1, damage_max = 1,
 				flavor_text = {launch: "It swings", hit: "It connects", miss: "It misses"}){
 		this.target_stat = target_stat;
-		this.accuracy = accuracy;
+		this.char_attacker = char_attacker;
 		this.damage_min = damage_min;
 		this.damage_max = damage_max;
 		this.flavor_text = flavor_text;
 	}
 	
-	calculateHitOn(character){
-		if (this.accuracy*Math.random()*2 > character.stats[this.target_stat]) {
+	calculateHitOn(char_attacked){
+		if (this.char_attacker.stats[this.target_stat]*Math.random()*2 > char_attacked.stats[this.target_stat]) {
 			return this.makeHit();
 		} else {
 			return this.makeMiss();
@@ -85,12 +88,12 @@ class Attack {
 	}
 	
 	makeMiss(){
-		return {attack_hit: false, damage: 0, flavor: this.flavor_text.miss}
+		return {attack_hit: false, damage: 0, flavor: this.flavor_text.miss, attack: this}
 	}
 	
 	makeHit(){
 		var damage_done = randomIntBetween(this.damage_min, this.damage_max);
-		return {attack_hit: true, damage: damage_done, flavor: this.flavor_text.hit}
+		return {attack_hit: true, damage: damage_done, flavor: this.flavor_text.hit, attack: this}
 	}
 }
 
@@ -102,6 +105,86 @@ function randomIntBetween(min, max){
 	max = Math.floor(max);
 	return Math.floor(Math.random()*(max - min + 1) + min);
 }
+
+var cur_encounter = null;
+var encounter_portrait = document.getElementById("encounter_portrait");
+function startEncounter(){
+	cur_encounter = new MonsterEncounter();
+	toggleEncounterDiv(true);
+	encounter_portrait.src = cur_encounter.monster.portrait;
+}
+
+function endEncounter(){
+	cur_encounter = null;
+	toggleEncounterDiv(false);
+	encounter_portrait.src = "";
+}
+
+map_wrapper = document.getElementById("map_container_wrapper");
+encounter_div = document.getElementById("encounter_div");
+function toggleEncounterDiv(is_encounter) {
+	if (is_encounter) {
+		map_wrapper.style.display = "none";
+		encounter_div.style.display = "block";
+	} else {
+		map_wrapper.style.display = "block";
+		encounter_div.style.display = "none";
+	}
+}
+
+// ###################### PLAYER STUFF ######################
+
+var player_character = new Character();
+
+var str_val = document.getElementById("str_val");
+var dex_val = document.getElementById("dex_val");
+var int_val = document.getElementById("int_val");
+function display_player_stats() {
+	str_val.innerText = player_character.stats["STR"];
+	dex_val.innerText = player_character.stats["DEX"];
+	int_val.innerText = player_character.stats["INT"];
+}
+
+player_character.all_attacks["basic_attack"] = new Attack(player_character,
+	target_stat = "STR", damage_min = 1, damage_max = 3,
+	flavor_text = {launch: "You swing...", hit: "You hit!", miss: "You miss."});
+
+display_player_stats();
+
+// #################### END PLAYER STUFF ####################
+
+function stepEncounter(){
+	if (cur_encounter != null) {		
+		flavor_div.innerHTML = "";
+		logAttack(player_character.all_attacks["basic_attack"].calculateHitOn(cur_encounter.monster));
+		logAttack(cur_encounter.monster.act()[0].calculateHitOn(player_character));
+	}
+}
+
+var flavor_div = document.getElementById("flavor");
+function logAttack(attack_results){
+	console.log(attack_results["attack"].flavor_text["launch"]);
+	if (attack_results["attack_hit"]) {
+		console.log(attack_results["flavor"], " Damage:", attack_results["damage"]);
+	} else {
+		console.log(attack_results["flavor"]);
+	}
+
+	flavor_div.innerHTML += attack_results["attack"].flavor_text["launch"];
+	flavor_div.innerHTML += "<br>";	
+	if (attack_results["attack_hit"]) {
+		flavor_div.innerHTML += attack_results["flavor"]+" Damage:"+attack_results["damage"];
+	} else {
+		flavor_div.innerHTML += attack_results["flavor"];
+	}
+	flavor_div.innerHTML += "<br>";
+}
+
+// ############################## END ENCOUNTER METHODS ##############################
+
+
+
+// ################################ MAP METHODS ################################
 
 class CellData {
 	/*
@@ -188,6 +271,8 @@ function add_horizontal_transitions(left_map, right_map){
 		right_map[i][0].special_behavior["left"] = transition_func(left_map, [i, MAX_COLS-1]);
 	}
 }
+
+// ############################## END MAP METHODS ##############################
 
 // ################################ CREATING THE MAPS ################################
 
@@ -279,6 +364,8 @@ add_horizontal_transitions(map_mountains, map_grasslands_north);
 
 // ############################## DONE CREATING THE MAPS ##############################
 
+
+
 var map_table = document.getElementById("map_table");
 
 function buildMap(map_array){
@@ -336,6 +423,11 @@ function isInBounds(square_pos, square_map=cur_map){
 			getCell(square_pos, square_map).passable);
 }
 
+function moveIfValid(direction){
+	if (cur_encounter == null) {
+		moveCharacter(direction);
+	}
+}
 
 function moveCharacter(direction){
 	// eraseCharacter(cur_square);
@@ -392,23 +484,37 @@ document.addEventListener('keydown', (e) => {
 	switch(e.code){
 		case("ArrowUp"):
 			e.preventDefault();
-			moveCharacter("up")
+			moveIfValid("up")
 			break;
 		case("ArrowDown"):
 			e.preventDefault();
-			moveCharacter("down")
+			moveIfValid("down")
 			break;
 		case("ArrowLeft"):
 			e.preventDefault();
-			moveCharacter("left")
+			moveIfValid("left")
 			break;
 		case("ArrowRight"):
 			e.preventDefault();
-			moveCharacter("right")
+			moveIfValid("right")
 			break;
 		case("Space"):
 			e.preventDefault();
-			moveCharacter("interact")
+			moveIfValid("interact")
+			break;
+		case("KeyJ"):
+			e.preventDefault();
+			startEncounter();
+			break;
+		case("KeyK"):
+			e.preventDefault();
+			endEncounter();
+			break;
+		case("KeyL"):
+			e.preventDefault();
+			stepEncounter();
+			break;
+		default:
 			break;
 	}
 });
@@ -454,20 +560,6 @@ function change_equipment(caller_ele) {
 		addEquipment(equip_selected[0], equip_selected[1]);
 	}
 }
-
-
-map_wrapper = document.getElementById("map_container_wrapper");
-encounter_div = document.getElementById("encounter_div");
-function toggle_encounter(is_encounter) {
-	if (is_encounter) {
-		map_wrapper.style.visibility = "hidden";
-		encounter_div.style.visibility = "visible";
-	} else {
-		map_wrapper.style.visibility = "visible";
-		encounter_div.style.visibility = "hidden";
-	}
-}
-
 
 arrow_dir_map = {
 	0: "up_left",
